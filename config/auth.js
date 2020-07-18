@@ -76,6 +76,42 @@ module.exports = {
     }
   },
 
+  customerJwt: {
+    serializer: 'lucid',
+    model: 'App/Models/Customer',
+    scheme: 'jwt',
+    uid: 'email_default',
+    password: 'password',
+    options: {
+      secret: Env.get('APP_KEY'),
+      expiresIn: "3600m" // 3600 minute
+    }
+  },
+
+  riderJwt: {
+    serializer: 'lucid',
+    model: 'App/Models/Rider',
+    scheme: 'jwt',
+    uid: 'email_default',
+    password: 'password',
+    options: {
+      secret: Env.get('APP_KEY'),
+      expiresIn: "3600m" // 3600 minute
+    }
+  },
+  adminJwt: {
+    serializer: 'lucid',
+    model: 'App/Models/Admin',
+    scheme: 'jwt',
+    uid: 'email_default',
+    password: 'password',
+    options: {
+      secret: Env.get('APP_KEY'),
+      expiresIn: "3600m" // 3600 minute
+    }
+  },
+
+
   /*
   |--------------------------------------------------------------------------
   | Api
