@@ -14,16 +14,15 @@ class FindCustomer {
     // call next to advance the request
     
     const customer = auth.user
+    // console.log(customer)
 
     if(!customer){
-      return response.status(404).json({ 
+      return response.status(401).json({ 
         mesage: "Customer not found!",
         id
       })
     }
-    request._body == null ? request.body = {} : null
-    request.body.customer = customer
-
+    // Object.assign(request.all(), customer.toJSON())
     await next()
   }
 }

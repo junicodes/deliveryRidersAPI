@@ -6,16 +6,14 @@ class LogCustomer {
   get rules () {
     return {
       // validation rules
-      auth_permit: 'min:3',
-      username: 'min:3',
+      email: 'min:3',
       password: 'required'
     }
   }
 
   get messages () {
     return {
-      'auth_permit.min': 'The registration field [email, phone] should be greater than 3.',
-      'username.min': 'The username field should be greater than 3.',
+      'email.min': 'The email field should be greater than 3.',
       'password.required': 'The password field is required'
     }
   }

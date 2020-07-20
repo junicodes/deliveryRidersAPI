@@ -76,11 +76,33 @@ module.exports = {
     }
   },
 
-  customerJwt: {
+  customerJwt1: {
     serializer: 'lucid',
     model: 'App/Models/Customer',
     scheme: 'jwt',
     uid: 'email_default',
+    password: 'password',
+    options: {
+      secret: Env.get('APP_KEY'),
+      expiresIn: "3600m" // 3600 minute
+    }
+  },
+  customerJwt2: {
+    serializer: 'lucid',
+    model: 'App/Models/Customer',
+    scheme: 'jwt',
+    uid: 'email_1',
+    password: 'password',
+    options: {
+      secret: Env.get('APP_KEY'),
+      expiresIn: "3600m" // 3600 minute
+    }
+  },
+  customerJwt3: {
+    serializer: 'lucid',
+    model: 'App/Models/Customer',
+    scheme: 'jwt',
+    uid: 'email_2',
     password: 'password',
     options: {
       secret: Env.get('APP_KEY'),

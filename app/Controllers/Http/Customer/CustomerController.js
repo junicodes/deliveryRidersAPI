@@ -6,6 +6,8 @@
 
 const Customer = use('App/Models/Customer')
 const Database = use('Database')
+const WelcomeMail = use('App/Controllers/Http/Email/WelcomeMail')
+
 
 class CustomerController {
   
@@ -23,28 +25,31 @@ class CustomerController {
   async store ({ request }) {
     
     const trx = await Database.beginTransaction()
+    const welcomeMail = new WelcomeMail 
     try {
-     const customerInfo = await Customer.create(request.post())
-      trx.commit()//once done commit the transaction
-      return {message: 'Successfully created a new customer.', customer: customerInfo, status: 200}
+      const customerInfo = await Customer.create(request.all())
+
+      const mailOut = await welcomeMail.send(customerInfo) //Send Welcome Mail with token
+
+      trx.commit() //once done commit the transaction
+      return {success: true, message: 'Successfully created a new customer.', customer: customerInfo, status: 201}
     } catch (error) {
 
       await trx.rollback()
-      return {message: 'An unexpected error occured when creating a customer.', hint: error.message, status:501}
+      return {error: false, message: 'An unexpected error occured when creating a customer.', hint: error.message, status:501}
     }
 
   }
 
-  async show ({ request, response }) {
-
-    const customer = request.post().customer
-    response.status(200).json({message: "Customer found!", data: customer})
+  async show ({ auth, response }) {
+    const customer = auth.user
+    response.status(200).json({message: "Customer found!", customer})
 
   }
  
   async update ({request, response }) {
 
-      const {name, phone, username, email, customer} = request.post()
+      const {name, phone, username, email, customer} = request.all()
       const trx = await Database.beginTransaction();
 
       try {
@@ -67,10 +72,17 @@ class CustomerController {
 
   async destroy ({request, response }) {
 
-    const customer = request.post().customer;
+    const customer = request.all().customer;
       await customer.delete();
       response.status(200).json({message: "Customer account duccesfully delete!"});
   }
+
+    //   async getPosts({request, response}) {
+    //     let posts = await Post.query().with('user').fetch()
+
+    //     return response.json(posts)
+    //   }
+
 }
 
 module.exports = CustomerController

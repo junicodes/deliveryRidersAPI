@@ -10,11 +10,11 @@ class AdminSchema extends Schema {
       table.string('firstname').comment('This is legal firstname name of the admin').notNullable()
       table.string('lastname').comment('This is legal lastname name of the admin').notNullable()
       table.string('email', 254).notNullable().unique().index()
-      table.string('image').defaultTo('no_img.png')
+      table.string('photo').defaultTo('no_img.png')
       table.string('admin_code').comment('This is the admin unique code for in house security').notNullable().unique().index()
       table.string('role').comment('This is identify what type of admin in the system, eg [sales,IT,super_admin,legal,customer_support]').nullable()
       table.string('password', 60).notNullable()
-      table.timestamps().table.timestamps().defaultTo(this.fn.now())
+      table.timestamps()
     })
   }
 
