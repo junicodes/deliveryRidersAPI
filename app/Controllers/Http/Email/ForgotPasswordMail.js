@@ -1,25 +1,24 @@
 const Mail = use('Mail')
 
 
-class WelcomeMail {
+class ForgotPasswordMail {
 
     async send (user) {
         try {
-            await Mail.send('emails.welcome', user.toJSON(), (message) => {
+            await Mail.send('emails.forgotPassword', user.toJSON(), (message) => {
                 message
-                    .to(user.email_default)
+                    .to(user.sendMailTo)
                     .from('info@cherrysoftdeliveryriders.com')
-                    .subject('Welcome To Cherrysoft Delivery Riders')
+                    .subject('Reset Password Verification Code')
             })
-    
+        
             return {status: true}
 
         } catch (error) {
             
             return {status: false, hint: error}
         }
-
     }
 }
 
-module.exports = WelcomeMail
+module.exports = ForgotPasswordMail

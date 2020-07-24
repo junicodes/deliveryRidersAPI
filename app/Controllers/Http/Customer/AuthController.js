@@ -28,7 +28,7 @@
             
         Object.assign(request.all(), moreData)
 
-        let res = await customerController.store({ request }) //Transfer to Customer Controller
+        let res = await customerController.store(request.all()) //Transfer to Customer Controller
 
         switch (res.status) {
           case 201:
@@ -71,13 +71,17 @@
           }
 
           if(passTwo.no_permit || passThree.no_permit) {
-            return response.status(404).json({no_permit: true, 
+            return response.status(401).json({no_permit: true, 
               message: 'Login not allowed, This email is associated with a registered email account.',
               hint: 'To use this associated email account for this process, you will have to login with the registered email account and give permission at Account Security And Settings.'
               })
 
+          } else if (passTwo.not_verified || passThree.not_verified) {
+            return response.status(401).json({no_permit: true, 
+              message: 'Login not allowed, You account is not yet verified.'
+              })
           } else {
-            return response.status(404).json({error: true, message: 'Not found!'})
+            return response.status(404).json({error: true, message: 'User Not Found', hint: 'This could be an Invalid Email or Password.'})
           }
 
       }
@@ -86,6 +90,9 @@
           try {
             if (await auth.authenticator('customerJwt1').attempt(email, password)) {
               const customer = await Customer.findBy('email_default', email)
+              if(customer.account_verified_at === null) {
+                return {not_verified: true, status: 401}
+              }
               return {success: true, customer, status: 200}
              }
           } catch (e) {
@@ -98,11 +105,15 @@
              //Check permission table before access
             if (await auth.authenticator('customerJwt2').attempt(email, password)) {
               const customer = await Customer.findBy('email_1', email)
-              console.log(customer.email_permit_1)
-              if(customer.email_permit_1) {
-                return {success: true, customer, status: 200}
+
+              if(customer.account_verified_at === null) {
+                return {not_verified: true, status: 401}
               }
-              return {no_permit: true, status: 404}
+
+              if(!customer.email_permit_1) {
+                return {no_permit: true, status: 401}
+              }
+              return {success: true, customer, status: 200}
             }
           } catch (e) {
             return {error: true, status: 404, hint: e.message}
@@ -113,10 +124,14 @@
              //Check permission table before access
             if (await auth.authenticator('customerJwt3').attempt(email, password)) {
               const customer = await Customer.findBy('email_2', email)
-              if(customer.email_permit_2) {
-                return {success: true, customer, status: 200}
+              if(customer.account_verified_at === null) {
+                return {not_verified: true, status: 401}
               }
-              return {no_permit: true, status: 404}
+
+              if(!customer.email_permit_2) {
+                return {no_permit: true, status: 401}
+              }
+              return {success: true, customer, status: 200}
             }
           } catch (e) {
             return {error: true, status: 404, hint: e.message}

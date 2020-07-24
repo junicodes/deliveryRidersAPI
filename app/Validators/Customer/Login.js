@@ -2,7 +2,7 @@
 
 const { formattters } = use('Validator')
 
-class LogCustomer {
+class Login {
   get rules () {
     return {
       // validation rules
@@ -26,4 +26,4 @@ class LogCustomer {
 
 }
 
-module.exports = LogCustomer
+module.exports = Login

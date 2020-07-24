@@ -1,5 +1,7 @@
 'use strict'
 
+const { RouteResource } = require('@adonisjs/framework/src/Route/Manager')
+
 /*
 |--------------------------------------------------------------------------
 | Routes
@@ -20,28 +22,45 @@ Route.get('/', () => {
   return { greeting: 'Hello every one this is CherrySoft Delivery Rider API' }
 })
 
-//Route prefix in this format api/v1
+
+//---------------------------------------------------------General Use
 Route.group(() => {
 
-  //---------------------------------------------------------General Use
+}).prefix('api/v1/general')
+
+
+
+//---------------------------------------------------------Admin
+
+Route.group(() => {
+ //-----------------------------Auth
+ Route.get('/customers/:page', 'Customer/CustomerController.index') //Fetch all customer from the database (admin)
+
+}).prefix('api/v1/admin')
+
+
+
+
+//---------------------------------------------------------Customer
+Route.group(() => {
+  //-----------------------------Auth
+  Route.post('register', 'Customer/AuthController.register').validator('Customer/Register').formats(['json']) //Create a New Customer in the application
+  Route.post('login', 'Customer/AuthController.login').validator('Customer/Login').formats(['json']) //Log in Customer into the application
+  Route.post('verify', 'Customer/VerifyController.verify').validator('Customer/AuthVerify').formats(['json']) //Verify customer verify code
+  Route.post('forgotPassword', 'Customer/ForgotPasswordController.forgotPassword').validator('Customer/ForgotPassword').formats(['json']) //Forgot Password
+  Route.post('resetPassword', 'Customer/ResetPasswordController.resetPassword').validator('Customer/ResetPassword').formats(['json']) //Reset Password 
   
-  //---------------------------------------------------------Admin
-  //-----------------------------Auth
-  Route.get('customers/:page', 'Customer/CustomerController.index') //Fetch all customer from the database (admin)
 
-  //---------------------------------------------------------Customer
-  //-----------------------------Auth
-  Route.post('/customer/register', 'Customer/AuthController.register').validator('RegCustomer').formats(['json']) //Create a New Customer in the application
-  Route.post('/customer/login', 'Customer/AuthController.login').validator('LogCustomer').formats(['json']) //Log in Customer into the application
+  Route.get('/', 'Customer/CustomerController.show').middleware(['auth:customerJwt1', 'findCustomer']).formats(['json'])//Fetch a customer
+  Route.put('update/:id', 'Customer/CustomerController.update').validator('Update').middleware(['auth:customerJwt1', 'findCustomer']).formats(['json'])//Update a customer
+  Route.delete('delete', 'Customer/CustomerController.destroy').middleware(['auth:customerJwt1', 'findCustomer']).formats(['json'])//Delete a customer
 
-  Route.get('customer', 'Customer/CustomerController.show').middleware(['auth:customerJwt1', 'findCustomer']).formats(['json'])//Fetch a customer
-  Route.put('customer/update', 'Customer/CustomerController.update').validator('UpdateCustomer').middleware(['auth:customerJwt', 'findCustomer']).formats(['json'])//Update a customer
-  Route.delete('customer/delete', 'Customer/CustomerController.destroy').middleware(['auth:customerJwt', 'findCustomer']).formats(['json'])//Delete a customer
-  //Route.post('customer', 'Customer/CustomerController.store').validator('RegCustomer')//Create a New Customer in the application
+}).prefix('api/v1/customer')
 
-  //--------------------------------------------------------Our Riders
-  //-----------------------------Auth
 
-}).prefix('api/v1')
 
+//---------------------------------------------------------Rider
+Route.group(() => {
+
+}).prefix('api/v1/rider')
 

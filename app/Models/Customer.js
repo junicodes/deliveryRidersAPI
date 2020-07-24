@@ -5,6 +5,11 @@ const Model = use('Model')
 
 class Customer extends Model {
     
+    static get hidden () {
+        return ['password', 'verify_code', '2_steps_security', 
+        'ban','email_permit_1', 'email_permit_2', 'account_verified_at']
+    }
+  
 }
 
 module.exports = Customer

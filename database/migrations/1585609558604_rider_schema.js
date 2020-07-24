@@ -28,6 +28,7 @@ class RiderSchema extends Schema {
       table.boolean('email_permit_1').defaultTo(false).comment('set permission for the first associated email login access')
       table.boolean('email_permit_2').defaultTo(false).comment('set permission for the second associated email login access')
       table.string('verify_code', 60).notNullable().unique()
+      table.datetime('account_verified_at').nullable()
       table.timestamps()
     })
   }
