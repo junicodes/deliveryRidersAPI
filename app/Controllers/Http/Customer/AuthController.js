@@ -4,6 +4,7 @@
     const Customer = use('App/Models/Customer');
     const CustomerController = use('App/Controllers/Http/Customer/CustomerController')
     const Hash = use('Hash')
+    const Env = use('Env')
  
     class AuthController {
 
@@ -32,13 +33,9 @@
 
         switch (res.status) {
           case 201:
-            let token = await auth.generate(res.customer)//generate token 
-
-            Object.assign(res.customer, token)//Assign token to customer object
-
-            return response.status(res.status).json({'success': res.success, message: res.message, data: res.customer})
+            return response.status(res.status).json({success: res.success, message: res.message, data: res.customer})
           case 501:
-             return response.status(res.status).json({'error': res.error, 'message': res.message, 'hint': res.hint})
+             return response.status(res.status).json({success: res.error, message: res.message, hint: res.hint})
         }
       }
       
@@ -51,23 +48,35 @@
         
           if(passOne.success) {
             token = await auth.generate(passOne.customer)
+            const photo =  {
+              photoUrl: Env.get('CLOUDINARY_IMAGE_URL'),
+              image: passOne.customer.photo
+            }
+            Object.assign(passOne.customer, {photo})
             Object.assign(passOne.customer, token)
             return response.status(200).json({success: true, customer: passOne.customer})
-
           }
           const passTwo = await this.passTwo(email, password, auth)
           if(passTwo.success) {
             token = await auth.generate(passTwo.customer)
+            const photo =  {
+              photoUrl: Env.get('CLOUDINARY_IMAGE_URL'),
+              image: passTwo.customer.photo
+            }
+            Object.assign(passTwo.customer, {photo})
             Object.assign(passTwo.customer, token)
             return response.status(200).json({success: true, customer: passTwo.customer})
-
           }
           const passThree = await this.passThree(email, password, auth)
           if(passThree.success) {
             token = await auth.generate(passThree.customer)
+            const photo =  {
+              photoUrl: Env.get('CLOUDINARY_IMAGE_URL'),
+              image: passThree.customer.photo
+            }
+            Object.assign(passThree.customer, {photo})
             Object.assign(passThree.customer, token)
             return response.status(200).json({success: true, customer: passThree.customer})
-
           }
 
           if(passTwo.no_permit || passThree.no_permit) {

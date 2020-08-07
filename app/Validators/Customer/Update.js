@@ -8,7 +8,6 @@ class Update {
       // validation rules
       firstname: 'required|min:3',
       lastname: 'required|min:3',
-      phone_default: `required|string|uniqueCompound:customers,phone_default/phone_1/phone_2,${id}`,
       address: `required|min:5`,
       city: 'required',
       state: 'required',
@@ -19,8 +18,6 @@ class Update {
     return {
       'firstname.required': 'Firstame field is required!',
       'lastname.required': 'Lastname field is required!',
-      'phone_default.required': 'Phone field is required',
-      'phone_default.uniqueCompound': 'Phone number of this sort exist or is associated with an account.',
       'username.required': 'The username field is require!',
       'address': 'Address is needed!',
       'city': 'Your residing city is needed!',
@@ -34,7 +31,7 @@ class Update {
 
   async fails(errorMessages) {
     console.log("f",errorMessages)
-    return this.ctx.response.status(200).json({
+    return this.ctx.response.status(422).json({
       message: errorMessages[0].message
     });
   }

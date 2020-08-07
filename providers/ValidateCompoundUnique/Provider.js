@@ -21,7 +21,8 @@ class ValidateExists extends ServiceProvider {
         }else {
            rows = await Database.table(table).where(column, value).first()
         }
-        if (rows) {
+        console.log(rows)
+        if (!rows) {
           throw message
         }
     }

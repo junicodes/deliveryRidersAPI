@@ -50,7 +50,7 @@ class CustomerController {
       customerInfo.code = null; //Remove the code value from the payload
       customerInfo.link = null; 
 
-      return {success: true, message: 'Successfully created a new customer.', customer: customerInfo, status: 201}
+      return {success: true, message: `Hurray! Your registration was successful, please go to (${customer.email_default}) confirm, Thank you.`, customer: customerInfo, status: 201}
     } catch (error) {
 
       await trx.rollback()
@@ -69,7 +69,7 @@ class CustomerController {
       
       const singleFileUpload = new SingleFileUploadController
       const customer = auth.user;
-      const {firstname, lastname, phone_default, address, city, state} = request.all()
+      const {firstname, lastname, address, city, state} = request.all()
       const folder = 'customers';
       const dbFile = customer.photo;
       const trx = await Database.beginTransaction();
@@ -77,39 +77,41 @@ class CustomerController {
       try {
         customer.firstname = firstname;
         customer.lastname = lastname;
-        customer.phone_default = phone_default;
         customer.address = address;
         customer.city = city;
         customer.state = state;
-        
+
         //handle file Upload 
-        const file = request.file('photo', {
-            types: ['image'],
-            size: '10mb',
-            extnames: ['png', 'jpg', 'jpeg']
-        });
-        
-        if(dbFile !== Env.get('DEFAULT_PHOTO')) {
-          const splitDbFile = dbFile.split(Env.get('CLOUDINARY_IMAGE_URL'))
-          const delRes = await singleFileUpload.handleDelete(splitDbFile[0]); //Delete an existing image from Cloudinary if in Database
-          if(!delRes.status) {return response.status(res.status).json({message:'An error occured while uploading image', hint: res.image_del_info})}
-        }
+        if(request.file('photo').clientName !== '@cdr-faker-file-349089-ignore.png'){
+          const file = request.file('photo', {
+              types: ['image'],
+              size: '30mb',
+              extnames: ['png', 'jpg', 'jpeg']
+          });
+          
+          if(dbFile !== Env.get('DEFAULT_PHOTO')) {
+            const delRes = await singleFileUpload.handleDelete(dbFile); //Delete an existing image from Cloudinary if in Database
+            if(!delRes.status) {return response.status(delRes.status).json({message:'An error occured while uploading image', hint: delRes.image_del_info})}
+          }
 
-        const res = await singleFileUpload.handleUpload(file, folder);
-        if(!res.status) {return response.status(res.status).json({message:'An error occured while uploading image', hint: res.image_up_info})}
-
-        customer.photo = res.image_up_info.public_id //Save image to Db and generate for response
+          const res = await singleFileUpload.handleUpload(file, folder);
+          if(!res.status) {return response.status(res.status).json({message:'An error occured while uploading image', hint: res.image_up_info})}
+          customer.photo = `${res.image_up_info.public_id}.${res.image_up_info.format}` //Save image to Db and generate for response
+        }      
         await customer.save(trx);
         trx.commit(); //once done commit the transaction
 
-        const photo = `${Env.get('CLOUDINARY_IMAGE_URL')}${res.image_up_info.public_id}`
+        const photo =  {
+          photoUrl: Env.get('CLOUDINARY_IMAGE_URL'),
+          image: customer.photo
+        }
         Object.assign(customer, {photo})
         
-        response.status(200).json({message: 'Your Account has been updated successfully!', customer});
+        response.status(200).json({status: true, message: 'Your Account has been updated successfully!', customer});
       } catch (error) {
 
         await trx.rollback()
-        response.status(501).json({message: 'An unexpected error occured when updating your account.', hint:  error.message});
+        response.status(501).json({status: false, message: 'An unexpected error occured when updating your account.', hint:  error.message});
       }
   }
 
@@ -118,9 +120,9 @@ class CustomerController {
     const customer = auth.user;
      try {
       await customer.delete();
-      response.status(200).json({message: "Account Delete Succesfully!"});
+      response.status(200).json({status: true, message: "Account Delete Succesfully!"});
      } catch (error) {
-      response.status(501).json({message: 'An unexpected error occured when updating your account.', hint:  error.message});
+      response.status(501).json({status: false, message: 'An unexpected error occured when updating your account.', hint:  error.message});
      }
 
   }

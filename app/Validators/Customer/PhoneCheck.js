@@ -19,7 +19,7 @@ class PhoneCheck {
    }
  
    async fails(errorMessages) {
-     return this.ctx.response.status(200).json({
+     return this.ctx.response.status(422).json({
        message: errorMessages[0].message
      });
    }

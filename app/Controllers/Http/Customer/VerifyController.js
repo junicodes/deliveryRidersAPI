@@ -22,13 +22,13 @@ class VerifyController {
                 await customer.save(trx)
                 trx.commit()
 
-                return response.status(200).json({status: true, message: 'Account verifcation successful', customer})
+                return response.status(200).json({success: true, message: 'Oh yea! Your account is successfully verified, please login to explore.', customer})
             }
-            return response.status(404).json({status: false, message: 'Verification code has expired or does not exist'})
+            return response.status(404).json({error: false, message: 'Verification code has expired or does not exist'})
         } catch (error) {
 
             await trx.rollback()
-            return response.status(501).json({message: 'An unexpected error occured when updating your account.', hint:  error.message});
+            return response.status(501).json({error: true, message: 'An unexpected error occured when updating your account.', hint:  error.message});
         }
         
     }

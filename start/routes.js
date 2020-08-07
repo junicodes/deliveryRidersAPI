@@ -49,10 +49,11 @@ Route.group(() => {
   Route.post('verify', 'Customer/VerifyController.verify').validator('Customer/AuthVerify').formats(['json']) //Verify customer verify code
   Route.post('forgotPassword', 'Customer/ForgotPasswordController.forgotPassword').validator('Customer/ForgotPassword').formats(['json']) //Forgot Password
   Route.post('resetPassword', 'Customer/ResetPasswordController.resetPassword').validator('Customer/ResetPassword').formats(['json']) //Reset Password 
+  Route.post('resendCode', 'Customer/ResendVerifyCodeControlller.resendCode').validator('Customer/ForgotPassword').formats(['json']) //Resend Verification Code
   
 
   Route.get('/', 'Customer/CustomerController.show').middleware(['auth:customerJwt1', 'findCustomer']).formats(['json'])//Fetch a customer
-  Route.put('update/:id', 'Customer/CustomerController.update').validator('Update').middleware(['auth:customerJwt1', 'findCustomer']).formats(['json'])//Update a customer
+  Route.put('update/:id', 'Customer/CustomerController.update').validator('Customer/Update').middleware(['auth:customerJwt1', 'findCustomer'])//Update a customer
   Route.delete('delete', 'Customer/CustomerController.destroy').middleware(['auth:customerJwt1', 'findCustomer']).formats(['json'])//Delete a customer
 
 }).prefix('api/v1/customer')
