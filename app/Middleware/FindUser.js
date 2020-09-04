@@ -2,9 +2,8 @@
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
-const Customer = use('App/Models/Customer')
 
-class FindCustomer {
+class FindUser {
   /**
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -13,18 +12,15 @@ class FindCustomer {
   async handle ({ request, response, auth}, next) {
     // call next to advance the request
     
-    const customer = auth.user
-    // console.log(customer)
+    const user = auth.user
 
-    if(!customer){
+    if(!user){
       return response.status(401).json({ 
-        mesage: "Customer not found!",
-        id
+        mesage: "User not found!"
       })
     }
-    // Object.assign(request.all(), customer.toJSON())
     await next()
   }
 }
 
-module.exports = FindCustomer
+module.exports = FindUser

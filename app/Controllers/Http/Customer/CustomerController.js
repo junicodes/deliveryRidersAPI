@@ -30,7 +30,7 @@ class CustomerController {
     const welcomeMail = new WelcomeMail 
     try {
       
-      const customerInfo = await Customer.create(customer)
+      const customerInfo = await Customer.create(customer, trx)
 
       const link = `${Env.get('FRONTEND_URL')}/auth?authType=confirm&verify_code=${customer.verify_code}`
 
@@ -41,8 +41,7 @@ class CustomerController {
       const mailOut = await welcomeMail.send(customerInfo, link) //Send Welcome Mail with token
 
       if(!mailOut.status) {
-        return response.status(501).json({status: false, 
-          message: 'Please there was an error sending you a verification mail, please refresh and try again or contact support to report this issue.'})
+          return {error: false, message: 'Please there was an error sending you a verification mail, this could be a bad network connection, please refresh and try again or contact support to report this issue.', hint: mailOut.hint, status:501}
       }
 
       trx.commit() //once done commit the transaction
@@ -85,17 +84,18 @@ class CustomerController {
         if(request.file('photo').clientName !== '@cdr-faker-file-349089-ignore.png'){
           const file = request.file('photo', {
               types: ['image'],
-              size: '30mb',
+              size: '100mb',
               extnames: ['png', 'jpg', 'jpeg']
           });
           
           if(dbFile !== Env.get('DEFAULT_PHOTO')) {
             const delRes = await singleFileUpload.handleDelete(dbFile); //Delete an existing image from Cloudinary if in Database
-            if(!delRes.status) {return response.status(delRes.status).json({message:'An error occured while uploading image', hint: delRes.image_del_info})}
+            console.log(delRes.status)
+            if(!delRes.status) {return response.status(delRes.status_code).json({ message:'An error occured while uploading image', hint: delRes.image_del_info})}
           }
 
           const res = await singleFileUpload.handleUpload(file, folder);
-          if(!res.status) {return response.status(res.status).json({message:'An error occured while uploading image', hint: res.image_up_info})}
+          if(!res.status) {return response.status(res.status_code).json({message:'An error occured while uploading image', hint: res.image_up_info})}
           customer.photo = `${res.image_up_info.public_id}.${res.image_up_info.format}` //Save image to Db and generate for response
         }      
         await customer.save(trx);

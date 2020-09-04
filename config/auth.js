@@ -114,7 +114,7 @@ module.exports = {
     serializer: 'lucid',
     model: 'App/Models/Rider',
     scheme: 'jwt',
-    uid: 'email_default',
+    uid: 'email',
     password: 'password',
     options: {
       secret: Env.get('APP_KEY'),
@@ -125,7 +125,7 @@ module.exports = {
     serializer: 'lucid',
     model: 'App/Models/Admin',
     scheme: 'jwt',
-    uid: 'email_default',
+    uid: 'email',
     password: 'password',
     options: {
       secret: Env.get('APP_KEY'),

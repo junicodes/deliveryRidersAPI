@@ -8,6 +8,10 @@
  
     class AuthController {
 
+      constructor() {
+        this.verifyCodeBreakOut = 0;
+      }
+
       async register({request, auth, response}) {
 
         const customerController = new CustomerController
@@ -18,13 +22,19 @@
         // if(check_auth !== -1) {request.body.email = email_default} else if(!isNaN(email_default)) {request.body.phone = email_default}
 
         //Generate a verification code
+        const verify_code = await this.createVerifyCode();
+
+        if(this.verifyCodeBreakOut === 3){
+            this.verifyCodebreakOut = 0
+            return response.status(501).json({success: false, message: 'An error occured, this might be a network issue or error generatinga a secure details for rider, please try again'})
+        }
            const moreData = {
               email_1: email_default,
               email_2: email_default,
               phone_1: phone_default,
               phone_2: phone_default,
-              password: await Hash.make(password), //Hash the password
-              verify_code: Math.floor(100000 + Math.random() * 900000)
+              password: await Hash.make(password), //Hash the passwordlo
+              verify_code
             } 
             
         Object.assign(request.all(), moreData)
@@ -82,7 +92,7 @@
           if(passTwo.no_permit || passThree.no_permit) {
             return response.status(401).json({no_permit: true, 
               message: 'Login not allowed, This email is associated with a registered email account.',
-              hint: 'To use this associated email account for this process, you will have to login with the registered email account and give permission at Account Security And Settings.'
+              hint: 'To use this associated email account for this process, you will have to login with your primary email account and give permission at Account Security And Settings.'
               })
 
           } else if (passTwo.not_verified || passThree.not_verified) {
@@ -146,6 +156,18 @@
             return {error: true, status: 404, hint: e.message}
           }
       }
+      async createVerifyCode () {
+            const verify_code = Math.floor(100000 + Math.random() * 900000);
+            const checkIfExist = await Customer.findBy('verify_code', verify_code)
+            if(checkIfExist) {
+                if(this.verifyCodeBreakOut < 3) {
+                    this.verifyCodeBreakOut++;
+                    await this.createVerifyCode(); 
+                }
+            }
+                return verify_code;
+        }
+
     }
 
     module.exports = AuthController

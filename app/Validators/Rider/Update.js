@@ -30,6 +30,7 @@ class Update {
   }
 
   async fails(errorMessages) {
+    console.log("f",errorMessages)
     return this.ctx.response.status(422).json({
       message: errorMessages[0].message
     });

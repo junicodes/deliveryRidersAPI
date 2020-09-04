@@ -20,11 +20,11 @@ class SingleFileUploadController {
     async handleDelete (file) {
         
         try {
+            console.log('here')
             if(file) {
                 let cloudinary_response = await Cloudinary.destroy(file)
                 return cloudinary_response;
             }
-
             return {status: false, error: 'Please provide a file to delete', status_code: 400}
         } catch (error) {
             return {status: false, error: error.message, status_code: 501}

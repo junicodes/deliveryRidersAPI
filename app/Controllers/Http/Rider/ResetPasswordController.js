@@ -1,6 +1,6 @@
 'use strict'
 
-const Customer = use('App/Models/Customer')
+const Rider = use('App/Models/Rider')
 const Database = use('Database')
 const Env = use('Env')
 const Hash = use('Hash')
@@ -16,24 +16,24 @@ class ResetPasswordController {
 
         let { verify_code, password } = request.all();
         console.log(password)
-        const customer = await Customer.findBy('verify_code', verify_code)
+        const rider = await Rider.findBy('verify_code', verify_code)
 
         const trx = await Database.beginTransaction()
         try {
-            if (customer) {
+            if (rider) {
                 //Generate a verification code
                 const verify_code = await this.createVerifyCode();
 
                 if (this.verifyCodeBreakOut === 3) {
                     this.verifyCodebreakOut = 0
-                    return response.status(501).json({ success: false, message: 'An error occured, this might be a network issue or error generating a secure details for customer, please try again' })
+                    return response.status(501).json({ success: false, message: 'An error occured, this might be a network issue or error generating a secure details for rider, please try again' })
                 }
-                customer.verify_code = verify_code
-                customer.password = await Hash.make(password)
-                await customer.save(trx)
+                rider.verify_code = verify_code
+                rider.password = await Hash.make(password)
+                await rider.save(trx)
                 trx.commit()
 
-                return response.status(200).json({ status: true, message: 'Your account password reset is done successful', customer })
+                return response.status(200).json({ status: true, message: 'Your account password reset is done successful', rider })
             }
             return response.status(404).json({ status: false, message: 'Verification code has expired or does not exist' })
         } catch (error) {
@@ -45,7 +45,7 @@ class ResetPasswordController {
     }
     async createVerifyCode() {
         const verify_code = Math.floor(100000 + Math.random() * 900000);
-        const checkIfExist = await Customer.findBy('verify_code', verify_code)
+        const checkIfExist = await Rider.findBy('verify_code', verify_code)
         if (checkIfExist) {
             if (this.verifyCodeBreakOut < 3) {
                 this.verifyCodeBreakOut++;

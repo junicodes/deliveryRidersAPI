@@ -7,6 +7,10 @@ const ForgotPasswordMail = use('App/Controllers/Http/Email/ForgotPasswordMail')
 
 class ForgotPasswordController {
 
+    constructor() {
+        this.verifyCodeBreakOut = 0;
+    }
+
     async forgotPassword ({request, response}) {
 
         const {email} = request.all()
@@ -16,10 +20,8 @@ class ForgotPasswordController {
         console.log(email)
         
         const customer = await Customer.query()
-                .where('email_default', email)
-                .orWhere('email_1', email)
-                .orWhere('email_2', email)
-                .first();
+                .where('email_default', email).orWhere('email_1', email)
+                .orWhere('email_2', email).first();
         
   
         const trx = await Database.beginTransaction()
@@ -34,7 +36,13 @@ class ForgotPasswordController {
         
                 }
 
-                const verify_code = Math.floor(100000 + Math.random() * 900000)
+                //Generate a verification code
+                const verify_code = await this.createVerifyCode();
+                if(this.verifyCodeBreakOut === 3){
+                    this.verifyCodebreakOut = 0
+                    return response.status(501).json({success: false, message: 'An error occured, this might be a network issue or error generating a secure details for customer, please try again'})
+                }
+
                 customer.verify_code = verify_code
                 await customer.save(trx)
 
@@ -63,6 +71,18 @@ class ForgotPasswordController {
             return response.status(501).json({message: 'An unexpected error occured when updating your account.', hint:  error.message});
         }
     }
+    async createVerifyCode () {
+        const verify_code = Math.floor(100000 + Math.random() * 900000);
+        const checkIfExist = await Customer.findBy('verify_code', verify_code)
+        if(checkIfExist) {
+            if(this.verifyCodeBreakOut < 3) {
+                this.verifyCodeBreakOut++;
+                await this.createVerifyCode(); 
+            }
+        }
+            return verify_code;
+    }
+    
 }
 
 module.exports = ForgotPasswordController
