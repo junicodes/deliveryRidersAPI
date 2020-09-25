@@ -11,7 +11,7 @@ class Update {
       address: `required|min:5`,
       city: 'required',
       state: 'required',
-      photo: 'required|file|file_ext:png,jpg,jpeg|file_size:100mb|file_types:image'
+      photo: 'required|file|file_ext:png,jpg,jpeg|file_size:50mb|file_types:image'
     }
   }
   get messages () {

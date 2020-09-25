@@ -25,9 +25,11 @@ Route.get('/', () => {
 
 //-------------------------------------------------------General Use
 Route.group(() => {
-
   Route.get('find-riders/:query/:page', 'Rider/RiderController.findRiders').middleware(['auth:customerJwt1,riderJwt', 'findUser']).formats(['json']) //Search for Riders 
-
+  Route.post('request-order', 'CurrentOrderController.requestOrder').validator('General/CurrentOrder').middleware(['auth:customerJwt1,riderJwt', 'findUser']).formats(['json']) //Order a Current Request
+  Route.get('current-orders/:page', 'CurrentOrderController.currentOrders').middleware(['auth:customerJwt1,riderJwt', 'findUser']).formats(['json']) //Get All Current Request
+  Route.put('update/current-orders', 'CurrentOrderController.updateOrder').middleware(['auth:customerJwt1,riderJwt', 'findUser']).formats(['json']) //Get All Current Request
+  Route.delete('delete/current-order', 'CurrentOrderController.deleteOrders').middleware(['auth:customerJwt1,riderJwt', 'findUser']).formats(['json']) //Delete All Current Request
 }).prefix('api/v1/general')
 
 
@@ -77,3 +79,9 @@ Route.group(() => {
 
 }).prefix('api/v1/rider')
 
+
+
+//------------------------------------------------------Test Case
+Route.group(() => {
+  Route.post('image-compress', 'TestController.imageCompress').middleware(['auth:customerJwt1,riderJwt', 'findUser']).formats(['json']) //Get All Current Request
+}).prefix('api/v1/test')

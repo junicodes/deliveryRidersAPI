@@ -10,7 +10,6 @@ const WelcomeMail = use('App/Controllers/Http/Email/WelcomeMail')
 const SingleFileUploadController = use('App/Controllers/Http/FileUpload/SingleFileUploadController')
 const Env = use('Env')
 
-
 class CustomerController {
   
   async index ({response, params: { page }}) {

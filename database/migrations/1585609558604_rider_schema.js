@@ -16,7 +16,7 @@ class RiderSchema extends Schema {
       table.string('city').nullable()
       table.string('state').nullable()
       table.string('active_vicinity').comment('This holds the array of business areas or vicinity rider operate at real time').nullable()
-      table.string('photo').defaultTo('no_img.png')
+      table.string('photo').defaultTo('cherishsoft-delivery-riders/default/no_img.png')
       table.string('marked_position').comment('This is the last positon of the rider').nullable()
       table.string('password', 60).notNullable()
       table.boolean('ban').defaultTo(false)

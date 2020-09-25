@@ -13,7 +13,7 @@ class SingleFileUploadController {
             }
             return {status: false, error: 'Please upload an image', status_code: 400};
         } catch (error) {
-            return {status: false, error: error.message, status_code: 501}
+            return {status: false, error, status_code: 501}
         }
     }
 

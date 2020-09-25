@@ -23,7 +23,6 @@ class AuthController {
         const rider_code  =  await this.createRiderCode()
 
         if(this.verifyCodeBreakOut === 3 || this.riderCodeBreakOut === 3){
-            console.log('error message break out')
             this.verifyCodebreakOut = 0
             this.riderCodeBreakOut = 0
             return response.status(501).json({success: false, message: 'An error occured, this might be a network issue or error generating a secure details for rider, please try again'})
@@ -90,7 +89,7 @@ class AuthController {
     }
 
     async createRiderCode () {
-        const rider_code = `CDR-${Math.floor(100000 + Math.random() * 900000)}`
+        const rider_code = `CDR${Math.floor(1000 + Math.random() * 9000)}`
         const checkIfExist = await Rider.findBy('rider_code', rider_code)
         if(checkIfExist) {
             if(this.riderCodeBreakOut < 3) {

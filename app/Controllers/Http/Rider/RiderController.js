@@ -65,7 +65,7 @@ class RiderController {
             if (request.file('photo').clientName !== '@cdr-faker-file-349089-ignore.png') {
                 const file = request.file('photo', {
                     types: ['image'],
-                    size: '1000mb',
+                    size: '100mb',
                     extnames: ['png', 'jpg', 'jpeg']
                 });
   
@@ -95,23 +95,53 @@ class RiderController {
     }
 
     async findRiders({response, params: {query, page}}) {
+        let findRiders = null;
+        if(!query) { 
+            return response.status(422).json({status: false, message: `Programmers Error, please insert the query or and the page number`})
+        }
 
-        console.log(query, page)
-        const findRiders = await Rider.query()
-                        .where('rider_code', 'LIKE', `%${query}%`)
-                        .orWhere('email', 'LIKE', `%${query}%`)
-                        .orWhere('firstname', 'LIKE', `%${query}%`)
-                        .orWhere('lastname', 'LIKE', `%${query}%`)
-                        .orWhere('active_vicinity', 'LIKE', `%${query}%`)
-                        .orWhere('address', 'LIKE', `%${query}%`)
-                        .orWhere('city', 'LIKE', `%${query}%`)
-                        .orWhere('state', 'LIKE', `%${query}%`)
-                        .paginate(page, 20);
-        console.log(findRiders)
-        
+        if(query.includes('%20')) {
+            findRiders = await this.findRidersQueryComplex(query.split('%20')[0], query.split('%20')[1], page);
+        }else {findRiders = await this.findRidersQueryDefault(query, page);}
+
         return response.status(200).json({status: true, message: `search riders result for ${query}`, findRiders})
 
     }
+
+    async findRidersQueryDefault(query, page) {
+        return await Rider.query()
+            .where('rider_code', 'LIKE', `%${query}%`)
+            .orWhere('email', 'LIKE', `%${query}%`)
+            .orWhere('firstname', 'LIKE', `%${query}%`)
+            .orWhere('lastname', 'LIKE', `%${query}%`)
+            .orWhere('active_vicinity', 'LIKE', `%${query}%`)
+            .orWhere('address', 'LIKE', `%${query}%`)
+            .orWhere('city', 'LIKE', `%${query}%`)
+            .orWhere('state', 'LIKE', `%${query}%`)
+            .paginate(page, 20);
+    }
+    
+    async findRidersQueryComplex(queryOne, queryTwo, page) {
+       return await Rider.query()
+            .where('rider_code', 'LIKE', `%${queryOne}%`)
+            .orWhere('email', 'LIKE', `%${queryOne}%`)
+            .orWhere('firstname', 'LIKE', `%${queryOne}%`)
+            .orWhere('lastname', 'LIKE', `%${queryOne}%`)
+            .orWhere('active_vicinity', 'LIKE', `%${queryOne}%`)
+            .orWhere('address', 'LIKE', `%${queryOne}%`)
+            .orWhere('city', 'LIKE', `%${queryOne}%`)
+            .orWhere('state', 'LIKE', `%${queryOne}%`)
+            .orWhere('rider_code', 'LIKE', `%${queryTwo}%`)
+            .orWhere('email', 'LIKE', `%${queryTwo}%`)
+            .orWhere('firstname', 'LIKE', `%${queryTwo}%`)
+            .orWhere('lastname', 'LIKE', `%${queryTwo}%`)
+            .orWhere('active_vicinity', 'LIKE', `%${queryTwo}%`)
+            .orWhere('address', 'LIKE', `%${queryTwo}%`)
+            .orWhere('city', 'LIKE', `%${queryTwo}%`)
+            .orWhere('state', 'LIKE', `%${queryTwo}%`)
+        .paginate(page, 20);
+    }
+
 }
 
 module.exports = RiderController

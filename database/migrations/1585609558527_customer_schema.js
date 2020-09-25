@@ -15,7 +15,7 @@ class CustomerSchema extends Schema {
       table.string('phone_default').comment('first mobile phone of the customer').notNullable().unique().index()
       table.string('phone_1').comment('This is second mobile phone of the customer').nullable()
       table.string('phone_2').comment('This is third mobile phone of the customer').nullable()
-      table.string('photo').defaultTo('no_img.png')
+      table.string('photo').defaultTo('cherishsoft-delivery-riders/default/no_img.png')
       table.string('address').nullable()
       table.string('city').nullable()
       table.string('state').nullable()
