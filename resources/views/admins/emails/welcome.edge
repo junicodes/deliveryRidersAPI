@@ -238,7 +238,7 @@
       ------------------------------------- */
         @media only screen and (max-width: 620px) {
             table[class=body] h1 {
-                font-size: 28px !important;
+                font-size: 25px !important;
                 margin-bottom: 10px !important;
             }
             table[class=body] p,
@@ -247,7 +247,7 @@
             table[class=body] td,
             table[class=body] span,
             table[class=body] a {
-                font-size: 16px !important;
+                font-size: 14px !important;
             }
             table[class=body] .wrapper,
             table[class=body] .article {
@@ -329,7 +329,7 @@
                                         <img class="imgg" width="50%" src="https://res.cloudinary.com/getfiledata/image/upload/v1597245980/cherishsoft-delivery-riders/bakendImages/cherrisoft_logoo.png" alt="logo"/>
                                         <td>
                                             <h3>Hi <small>{{firstname}}&nbsp;{{lastname}}</small></h3>
-                                            <h4>Your Unique Rider Code is  <b>({{rider_code}})</b></h4>
+                                            <h4>Your Personnal Admin Code is  <b>({{admin_code}})</b></h4>
                                             
                                             <h2 class="custom-font" style="font-size: 20px">Welcome to Cherishsoft Delivery Riders!</h2>
 
@@ -337,14 +337,14 @@
                                                  transparent, hardworking and most importantly trust worthy, 
                                                  we are certain that you will enjoy your time with us, Thank you. </p>
                                                
-                                            <p>Your New Rider Login Details: <br><br>
+                                            <p>Your New Admin Login Details: <br><br>
                                                 <b>
                                                     Email: {{ email }} <br /> Password: {{ pass }}
                                                 </b>
                                             </p><br>
                                 
                                             <p style="text-transform: capitalize;">To access Login page, please follow this link
-                                                {{ toAnchor(link, link) }} to continue access dashboard.
+                                               <span style="">{{ toAnchor(link, link) }}</span> to continue access dashboard.
                                                 <br>
                                                 <span style="color: red;">Please make sure to update you password to a new one of your choice....</span>
                                             </p>

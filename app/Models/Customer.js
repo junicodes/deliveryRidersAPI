@@ -4,6 +4,11 @@
 const Model = use('Model')
 
 class Customer extends Model {
+
+    // static boot() {
+    //     super.boot();
+    //     this.addGlobalScope(builder => builder.with('currentOrder'));
+    // }
     
     static get hidden () {
         return ['password', 'verify_code', '2_steps_security', 
@@ -12,6 +17,10 @@ class Customer extends Model {
 
     currentOrder () {
         return this.hasMany('App/Models/CurrentOrder')
+    }
+    
+    messageReply() {
+        return this.hasMany('App/Models/MessageReply')
     }
 }
 

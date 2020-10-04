@@ -19,7 +19,7 @@ class AuthController {
         const riderController = new RiderController
 
         const password    =  await this.passwordGenerator(8)//Genrated a ramdom password for user 
-        const verify_code = await this.createVerifyCode();
+        const verify_code =  await this.createVerifyCode();
         const rider_code  =  await this.createRiderCode()
 
         if(this.verifyCodeBreakOut === 3 || this.riderCodeBreakOut === 3){
@@ -53,17 +53,16 @@ class AuthController {
         try {
             if(await auth.authenticator('riderJwt').attempt(email, password)) {
                 const rider = await Rider.findBy('email', email)
-                const token = await auth.generate(rider)
+                const authToken = await auth.generate(rider)
                 const photo = {
                     photoUrl: Env.get('CLOUDINARY_IMAGE_URL'),
                     image: rider.photo
                 }
-                Object.assign(rider, {photo})
-                Object.assign(rider, token)
+                Object.assign(rider, {photo, authToken})
                 return response.status(200).json({success:true, rider})
             }
         } catch (error) {
-            return {error: false, message: 'Invalid Details, please check if email or password are correct, if issues persit please contact support.', hint: error.message, status:501}
+            return response.status(501).json({error: false, message: 'Invalid Details, please check if email or password are correct, if issues persit please contact support.', hint: error.message})  
         }
     }
 

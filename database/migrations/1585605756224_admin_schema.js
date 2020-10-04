@@ -14,6 +14,10 @@ class AdminSchema extends Schema {
       table.string('admin_code').comment('This is the admin unique code for in house security').notNullable().unique().index()
       table.string('role').comment('This is identify what type of admin in the system, eg [sales,IT,super_admin,legal,customer_support]').nullable()
       table.string('password', 60).notNullable()
+      table.string('verify_code', 60).nullable()
+      table.datetime('account_verified_at').nullable()
+      table.boolean('ban').defaultTo(false)
+      table.boolean('2_steps_security').defaultTo(false)
       table.timestamps()
     })
   }

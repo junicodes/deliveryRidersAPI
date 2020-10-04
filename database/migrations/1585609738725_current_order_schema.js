@@ -27,7 +27,7 @@ class CurrentOrderSchema extends Schema {
       table.date('expectation_date').comment('The date to expect this delivery').notNullable()
       table.date('expectation_time').comment('The Time to expected for this delivery').notNullable()
       table.date('received_date').comment('The date the goods was received').nullable()
-      table.enu('status', ['Processing', 'Delayed', 'Pending','Declined', 'Accepted']).comment('This is the estimated price for this order')
+      table.enu('status', ['Pending', 'Processing', 'Delayed', 'Declined', 'Accepted']).comment('This is the estimated price for this order').notNullable()
       table.text('description').comment('This is the more descriptive informtaion of the product').nullable()
       table.timestamps()
 

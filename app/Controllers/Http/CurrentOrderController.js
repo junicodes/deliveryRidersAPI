@@ -17,9 +17,15 @@ class CurrentOrderController {
   async currentOrders({ response, auth, params: { page } }) {
     let currentOrders;
 
-    if(auth.user.rider_code) {currentOrders = await CurrentOrder.query().where('rider_code', auth.user.rider_code).with('rider').paginate(page)} 
-
-    if(!auth.user.rider_code) {currentOrders = await CurrentOrder.query().where('customer_id', auth.user.id).with('customer').paginate(page)}
+    !auth.user.rider_code ? Object.assign(auth.user, {rider_code: null}) : null;
+    currentOrders = await CurrentOrder.query()
+                                    .whereIn('status', ['Processing', 'Pending', 'Delayed'])
+                                    .where((builder) => {
+                                      builder.where('customer_id', auth.user.id)
+                                              .orWhere('rider_code', auth.user.rider_code)
+                                      })
+                                    .with('customer').with('rider').with('transitReport')
+                                    .paginate(page)
 
     response.status(200).json({ message: "Your current orders", data: currentOrders })
   }
@@ -27,10 +33,17 @@ class CurrentOrderController {
 
   async requestOrder({ request, auth, response }) {
     const imagekitFileUpload = new ImagekitFileUploadController;
+    const {expectation_time} = request.post();
     const folder = 'request-orders';
     const customer = auth.user;
     const receiver_photo = request.file('receiver_photo');
     const product_photo = request.file('product_photo');
+
+    //Validate expectation time 
+    const splitTime = expectation_time.split(':')
+    if(Number(splitTime[0]) < 9 ||  Number(splitTime[0]) > 17) {
+      return response.status(422).json({status: false, message: 'Please choose a friendly working time between (9:00 AM - 5:00 PM)'})
+    }
 
     const trx = await Database.beginTransaction()
     try {
@@ -83,7 +96,7 @@ class CurrentOrderController {
         //Add Image url to the Object Payload
         Object.assign(saveOrder, { imagekitUrl: Env.get('IMAGEKIT_PUBLIC_URL'), imageCforce: Env.get('IMAGEKIT_CFORCE') })
 
-        return response.status(200).json({ status: true, message: 'Your Order request is successfull!', currentOrder: saveOrder })
+        return response.status(200).json({ status: true, message: 'Your order request is successful!', currentOrder: saveOrder })
       } catch (error) {
         await trx.rollback()
         return response.status(501).json({ status: false, message: 'An unexpected error occured!', hint: error.message })

@@ -1,93 +1,45 @@
 'use strict'
 
-/** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/framework/src/Response')} Response */
-/** @typedef {import('@adonisjs/framework/src/View')} View */
+const Admin = use('App/Models/Admin')
+const Database = use('Database')
+const WelcomeMail = use('App/Controllers/Http/Email/Admin/WelcomeMail')
+const Env = use('Env')
 
-/**
- * Resourceful controller for interacting with admins
- */
 class AdminController {
-  /**
-   * Show a list of all admins.
-   * GET admins
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
+
+  async store (admin, password, verify_code) {
+
+    console.log(admin, password, verify_code)
+    const trx = await Database.beginTransaction()
+    const welcomeMail = new WelcomeMail
+
+    try {
+      const adminInfo = await Admin.create(admin, trx)
+
+      const link = `${Env.get('FRONTEND_URL')}/auth?authType=adminLogin&link_code=${verify_code}`
+
+      const email_secrete = {pass: password, link}
+
+      Object.assign(adminInfo, email_secrete)
+
+      const mailOut = await welcomeMail.send(adminInfo, link)
+
+      if (!mailOut.status) {
+        return { error: false, message: 'Please there was an error sending login details to your admin email account, this could be a bad network connection, please refresh and try again or contact technical support.', hint: mailOut.hint, status: 501 }
+      }
+
+      await trx.commit()
+      adminInfo.pass = null
+      adminInfo.link = null
+
+      return { success: true, message: `Hurray! Rider registration was successful, please rider should recieve an email to account (${admin.email}) to login, Thank you.`, admin: adminInfo, status: 201 }
+    } catch (error) {
+        await trx.rollback()
+        return { error: false, message: 'An unexpected error occured when creating a rider.', hint: error.message, status: 501 }
+    }
   }
 
-  /**
-   * Render a form to be used for creating a new admin.
-   * GET admins/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
-  }
-
-  /**
-   * Create/save a new admin.
-   * POST admins
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, response }) {
-  }
-
-  /**
-   * Display a single admin.
-   * GET admins/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing admin.
-   * GET admins/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update admin details.
-   * PUT or PATCH admins/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
-  }
-
-  /**
-   * Delete a admin with id.
-   * DELETE admins/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
-  }
+  
 }
 
 module.exports = AdminController

@@ -26,7 +26,7 @@ class RiderController {
 
             const link = `${Env.get('FRONTEND_URL')}/auth?authType=riderLogin`
 
-            const email_secrete = { pass: password, link: link }
+            const email_secrete = { pass: password, link}
 
             Object.assign(riderInfo, email_secrete)
 
