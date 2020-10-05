@@ -12,11 +12,11 @@
         this.verifyCodeBreakOut = 0;
       }
 
-      async register({request, auth, response}) {
+      async register({request, response}) {
 
         const customerController = new CustomerController
 
-        let {phone_default, email_default, password} = request.all() //Get Data form api
+        let {phone_default, email_default, password} = request.post() //Get Data form api
 
         // const check_auth = email_default.indexOf("@")//Check if the auth permit is a phone or email access
         // if(check_auth !== -1) {request.body.email = email_default} else if(!isNaN(email_default)) {request.body.phone = email_default}
@@ -37,9 +37,9 @@
               verify_code
             } 
             
-        Object.assign(request.all(), moreData)
+        Object.assign(request.post(), moreData)
 
-        let res = await customerController.store(request.all()) //Transfer to Customer Controller
+        let res = await customerController.store(request.post()) //Transfer to Customer Controller
 
         switch (res.status) {
           case 201:

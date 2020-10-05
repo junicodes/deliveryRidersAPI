@@ -29,8 +29,17 @@ class Register {
   }
   
   async fails(errorMessages) {
-    return this.ctx.response.status(422).json({
-       message: errorMessages[0].message
+    let status = 422;
+    let hint = 'Validaion needed';
+
+    if(errorMessages[0].message.includes('getaddrinfo ENOTFOUND')) {
+      status = 500;
+      hint = 'This might be a poor internet connection.'
+    }
+
+    return this.ctx.response.status(status).json({
+       message: errorMessages[0].message,
+       hint
     });
   }
   

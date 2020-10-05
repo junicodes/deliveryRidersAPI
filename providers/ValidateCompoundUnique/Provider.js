@@ -2,27 +2,28 @@
 
 const { ServiceProvider } = require('@adonisjs/fold')
 
+
 class ValidateExists extends ServiceProvider {
   async _uniqueFn (data, field, message, args, get) {
     const Database = use('Database')
-    let value = get(data, field) // Get the value
-
     let ignoreId = null
-    const fields = args[1].split('/')
-    const table = args[0]
+    let value = await get(data, field) // Get the value
+
+    const table = args[0] //The Database table to check
+    const fields = args[1].split('/') //The row column of this table
     if (args[2]) {
-      ignoreId = args[2]
+      ignoreId = args[2] //The Id of the User so as to exclude him
     }
-  
-    for (const column of fields) {
-        let rows;
+
+    for (const column of fields) { //fields are array iof database colunm
+        let rows = null;
         if(ignoreId){
            rows = await Database.table(table).where(column, value).whereNot('id', '=', ignoreId).first()
         }else {
            rows = await Database.table(table).where(column, value).first()
         }
-        console.log(rows)
-        if (!rows) {
+
+        if (rows) {
           throw message
         }
     }
