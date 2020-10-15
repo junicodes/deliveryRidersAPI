@@ -7,6 +7,7 @@ class MessageSchema extends Schema {
   up () {
     this.create('messages', (table) => {
       table.increments()
+      table.integer('order_id').nullable()
       table.integer('from_id').nullable()
       table.integer('to_id').nullable()
       table.text('from_user_data').nullable()

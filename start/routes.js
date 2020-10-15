@@ -47,6 +47,11 @@ Route.group(() => {
   Route.get('order-records/:page', 'OrderRecordController.getOrderRecords').middleware(['auth:customerJwt1,riderJwt']).formats(['json']) // Get all Order Records (Customer & Rider)
 
   Route.get('track-order/:orderId', 'TrackOrderController.trackOrder').middleware(['auth:customerJwt1,riderJwt,adminJwt']).formats(['json']) //Track a current Order request
+
+  Route.post('send-message', 'MessageController.sendMessage').middleware(['auth:customerJwt1,riderJwt,adminJwt']).formats(['json']) //Send Message (Admin, Rider, Customer)
+
+  Route.get('messages/:page', 'MessageController.fetchMessages').middleware(['auth:customerJwt1,riderJwt,adminJwt']).formats(['json']) //Get related Messaege for a user
+
 }).prefix('api/v1/general')
 
 

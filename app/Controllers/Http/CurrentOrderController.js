@@ -27,7 +27,7 @@ class CurrentOrderController {
                                     .with('customer').with('rider').with('transitReport')
                                     .paginate(page)
 
-    response.status(200).json({ message: "Your current orders", data: currentOrders })
+    response.status(200).json({status: true, message: "Your current orders", currentOrders })
   }
 
 
@@ -54,7 +54,7 @@ class CurrentOrderController {
         if(this.orderIdCodeBreakOut === 3 || this.acceptanceCodeBreakOut  === 3){
             this.orderIdCodeBreakOut = 0
             this.acceptanceCodeBreakOut = 0;
-            return response.status(501).json({success: false, message: 'An error occured, this might be a network issue or error generating a secure details for rider, please try again'})
+            return response.status(501).json({status: false, message: 'An error occured, this might be a network issue or error generating a secure details for rider, please try again'})
         }
 
         if (receiver_photo.clientName !== '@cdr-faker-file-349089-ignore.png') {
